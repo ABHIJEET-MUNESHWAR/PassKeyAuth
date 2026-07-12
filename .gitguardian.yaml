@@ -1,0 +1,13 @@
+# GitGuardian configuration.
+#
+# The value flagged in Anchor.toml (`passkeyauth = "8tK...Az7m"`) is a Solana
+# PROGRAM ID — a public key (base58), not a secret. It is derived from the
+# program keypair and is meant to be public: it appears in `declare_id!`, in
+# Anchor.toml, and on-chain. The corresponding PRIVATE keypair
+# (target/deploy/passkeyauth-keypair.json) is gitignored and never committed.
+# This entry silences the high-entropy false positive for that public address.
+version: 2
+secret:
+  ignored-matches:
+    - name: Solana program ID (public key, not a secret)
+      match: 8tKno5VNAXXoS6pXAebh1Fhoj2C4QrRQrqFAy8nfAz7m
