@@ -16,9 +16,7 @@ use futures::Stream;
 use passkeyauth_core::events::AttestationEvent;
 use passkeyauth_core::ports::EventStream;
 use passkeyauth_core::IdentityEngine;
-use passkeyauth_types::{
-    Digest, IdentityStats, IdentityView, IssuerView, MerkleProof, Pubkey,
-};
+use passkeyauth_types::{Digest, IdentityStats, IdentityView, IssuerView, MerkleProof, Pubkey};
 use tokio_stream::StreamExt;
 
 /// Shared GraphQL context: the engine plus the event stream port.
@@ -306,7 +304,10 @@ impl Mutation {
             merkle_root: Digest::zero(),
             attestation_count: 0,
         };
-        c.engine.ingest_issuer(issuer.clone()).await.map_err(to_err)?;
+        c.engine
+            .ingest_issuer(issuer.clone())
+            .await
+            .map_err(to_err)?;
         Ok(issuer.into())
     }
 
@@ -396,7 +397,10 @@ mod tests {
             bus.clone(),
             EngineConfig::default(),
         );
-        build_schema(GraphQlContext { engine, events: bus })
+        build_schema(GraphQlContext {
+            engine,
+            events: bus,
+        })
     }
 
     #[tokio::test]
@@ -426,7 +430,8 @@ mod tests {
         let br = s.execute(GqlRequest::new(build)).await;
         assert!(br.errors.is_empty(), "{:?}", br.errors);
 
-        let proof = format!("{{ proof(issuer: \"{issuer}\", index: 0) {{ leaf siblings indexBits }} }}");
+        let proof =
+            format!("{{ proof(issuer: \"{issuer}\", index: 0) {{ leaf siblings indexBits }} }}");
         let pr = s.execute(GqlRequest::new(proof)).await;
         assert!(pr.errors.is_empty(), "{:?}", pr.errors);
     }

@@ -147,7 +147,9 @@ impl IdentityEngine {
     ) -> Result<MerkleProof, EngineError> {
         let leaves = self.trees.get_leaves(issuer_addr).await?;
         let tree = MerkleTree::from_leaves(leaves.iter().map(|d| d.0).collect());
-        let (siblings, index_bits) = tree.proof(index).ok_or(EngineError::LeafOutOfRange(index))?;
+        let (siblings, index_bits) = tree
+            .proof(index)
+            .ok_or(EngineError::LeafOutOfRange(index))?;
         Ok(MerkleProof {
             leaf: leaves[index],
             siblings: siblings.into_iter().map(Digest::new).collect(),
@@ -167,7 +169,12 @@ impl IdentityEngine {
     ) -> Result<bool, EngineError> {
         let issuer = self.issuers.issuer(issuer_addr).await?;
         let siblings: Vec<[u8; 32]> = proof.siblings.iter().map(|d| d.0).collect();
-        let valid = merkle::verify(proof.leaf.0, &siblings, proof.index_bits, issuer.merkle_root.0);
+        let valid = merkle::verify(
+            proof.leaf.0,
+            &siblings,
+            proof.index_bits,
+            issuer.merkle_root.0,
+        );
         self.events
             .publish(AttestationEvent::ProofVerified {
                 issuer: *issuer_addr,
@@ -346,7 +353,9 @@ mod tests {
         let e = engine();
         let addr = Pubkey::new([7; 32]);
         e.ingest_issuer(issuer(7)).await.unwrap();
-        e.build_tree(&addr, vec![Digest::new([1; 32])]).await.unwrap();
+        e.build_tree(&addr, vec![Digest::new([1; 32])])
+            .await
+            .unwrap();
         assert!(matches!(
             e.prove(&addr, 5).await,
             Err(EngineError::LeafOutOfRange(5))
