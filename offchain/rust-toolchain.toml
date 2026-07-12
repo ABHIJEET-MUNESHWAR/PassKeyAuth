@@ -1,0 +1,5 @@
+# The off-chain risk-engine workspace builds on stable Rust. The on-chain
+# Anchor program is built separately with `cargo build-sbf` (platform-tools).
+[toolchain]
+channel = "stable"
+components = ["rustfmt", "clippy"]

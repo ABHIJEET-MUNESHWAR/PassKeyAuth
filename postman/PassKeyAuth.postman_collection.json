@@ -1,0 +1,132 @@
+{
+  "info": {
+    "name": "PassKeyAuth Identity & Attestation Service",
+    "description": "GraphQL API for the PassKeyAuth off-chain identity service. Point {{baseUrl}} at a running passkeyauth-node (default http://localhost:8080). buildTree builds an issuer's keccak Merkle tree over eligible commitments; proof generates a membership proof; verifyProof checks it against the issuer root exactly as the on-chain program does.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "issuer", "value": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" },
+    { "key": "authority", "value": "1111111111111111111111111111111111111111111111111111111111111111" },
+    { "key": "schemaId", "value": "0707070707070707070707070707070707070707070707070707070707070707" }
+  ],
+  "item": [
+    {
+      "name": "Health — liveness",
+      "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/health/live", "host": ["{{baseUrl}}"], "path": ["health", "live"] } }
+    },
+    {
+      "name": "Health — readiness",
+      "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/health/ready", "host": ["{{baseUrl}}"], "path": ["health", "ready"] } }
+    },
+    {
+      "name": "Metrics (Prometheus)",
+      "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/metrics", "host": ["{{baseUrl}}"], "path": ["metrics"] } }
+    },
+    {
+      "name": "Query — identities",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "graphql",
+          "graphql": {
+            "query": "query Identities {\n  identities {\n    address\n    owner\n    passkeys { pubkeyHex label addedTs }\n    attestations { issuer schemaId claimedTs }\n  }\n}",
+            "variables": "{}"
+          }
+        },
+        "url": { "raw": "{{baseUrl}}/graphql", "host": ["{{baseUrl}}"], "path": ["graphql"] }
+      }
+    },
+    {
+      "name": "Query — issuers",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "graphql",
+          "graphql": {
+            "query": "query Issuers {\n  issuers {\n    address\n    authority\n    schemaId\n    merkleRoot\n    attestationCount\n  }\n}",
+            "variables": "{}"
+          }
+        },
+        "url": { "raw": "{{baseUrl}}/graphql", "host": ["{{baseUrl}}"], "path": ["graphql"] }
+      }
+    },
+    {
+      "name": "Query — stats",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "graphql",
+          "graphql": {
+            "query": "query Stats {\n  stats {\n    identities\n    issuers\n    passkeys\n    attestations\n  }\n}",
+            "variables": "{}"
+          }
+        },
+        "url": { "raw": "{{baseUrl}}/graphql", "host": ["{{baseUrl}}"], "path": ["graphql"] }
+      }
+    },
+    {
+      "name": "Mutation — ingest issuer",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "graphql",
+          "graphql": {
+            "query": "mutation Ingest($address: String!, $authority: String!, $schemaId: String!) {\n  ingestIssuer(address: $address, authority: $authority, schemaId: $schemaId) {\n    address\n    merkleRoot\n  }\n}",
+            "variables": "{\"address\": \"{{issuer}}\", \"authority\": \"{{authority}}\", \"schemaId\": \"{{schemaId}}\"}"
+          }
+        },
+        "url": { "raw": "{{baseUrl}}/graphql", "host": ["{{baseUrl}}"], "path": ["graphql"] }
+      }
+    },
+    {
+      "name": "Mutation — build tree",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "graphql",
+          "graphql": {
+            "query": "mutation Build($input: BuildTreeInput!) {\n  buildTree(input: $input)\n}",
+            "variables": "{\n  \"input\": {\n    \"issuer\": \"{{issuer}}\",\n    \"leaves\": [\n      \"0101010101010101010101010101010101010101010101010101010101010101\",\n      \"0202020202020202020202020202020202020202020202020202020202020202\",\n      \"0303030303030303030303030303030303030303030303030303030303030303\",\n      \"0404040404040404040404040404040404040404040404040404040404040404\"\n    ]\n  }\n}"
+          }
+        },
+        "url": { "raw": "{{baseUrl}}/graphql", "host": ["{{baseUrl}}"], "path": ["graphql"] }
+      }
+    },
+    {
+      "name": "Query — proof",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "graphql",
+          "graphql": {
+            "query": "query Proof($issuer: String!) {\n  proof(issuer: $issuer, index: 0) {\n    leaf\n    siblings\n    indexBits\n  }\n}",
+            "variables": "{\"issuer\": \"{{issuer}}\"}"
+          }
+        },
+        "url": { "raw": "{{baseUrl}}/graphql", "host": ["{{baseUrl}}"], "path": ["graphql"] }
+      }
+    },
+    {
+      "name": "Mutation — verify proof",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "graphql",
+          "graphql": {
+            "query": "mutation Verify($input: VerifyProofInput!) {\n  verifyProof(input: $input)\n}",
+            "variables": "{\n  \"input\": {\n    \"issuer\": \"{{issuer}}\",\n    \"leaf\": \"0101010101010101010101010101010101010101010101010101010101010101\",\n    \"siblings\": [],\n    \"indexBits\": 0\n  }\n}"
+          }
+        },
+        "url": { "raw": "{{baseUrl}}/graphql", "host": ["{{baseUrl}}"], "path": ["graphql"] }
+      }
+    }
+  ]
+}

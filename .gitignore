@@ -1,0 +1,19 @@
+# Rust / Cargo
+/target
+**/target
+**/*.rs.bk
+*.pdb
+
+# Anchor / Solana
+.anchor
+test-ledger
+**/*.so
+!programs/**/src/**
+target/deploy/*.json
+
+# Env / secrets
+.env
+*.log
+
+# OS
+.DS_Store

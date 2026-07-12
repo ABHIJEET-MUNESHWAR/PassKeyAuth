@@ -1,0 +1,25 @@
+# PassKeyAuth on-chain Anchor workspace.
+# The off-chain attestation/indexer service lives in ./offchain (its OWN cargo
+# workspace) to keep the async stack independent of the Solana crate graph.
+[workspace]
+resolver = "2"
+members = ["programs/*"]
+exclude = ["offchain"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["Abhijeet Ashok Muneshwar <openingknots@gmail.com>"]
+repository = "https://github.com/ABHIJEET-MUNESHWAR/PassKeyAuth"
+
+[workspace.dependencies]
+anchor-lang = "0.32.1"
+
+[profile.release]
+overflow-checks = true
+
+[profile.release.build-override]
+opt-level = 3
+incremental = false
+codegen-units = 1

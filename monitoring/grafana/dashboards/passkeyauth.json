@@ -1,0 +1,88 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 0,
+  "title": "PassKeyAuth Identity Overview",
+  "uid": "passkeyauth-risk",
+  "tags": ["passkeyauth", "risk"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "time": { "from": "now-1h", "to": "now" },
+  "refresh": "10s",
+  "templating": { "list": [] },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Identities mirrored",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "passkeyauth_identities", "refId": "A" }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Attestations",
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        { "expr": "passkeyauth_attestations", "refId": "A" }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Issuers",
+      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        { "expr": "passkeyauth_issuers", "refId": "A" }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Poll & scan rate (per s)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "rate(passkeyauth_poll_total[5m])", "legendFormat": "poll", "refId": "A" },
+        { "expr": "rate(passkeyauth_scan_total[5m])", "legendFormat": "scan", "refId": "B" }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Keeper errors (per s)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "rate(passkeyauth_poll_errors_total[5m])", "legendFormat": "poll errors", "refId": "A" },
+        { "expr": "rate(passkeyauth_scan_errors_total[5m])", "legendFormat": "scan errors", "refId": "B" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+# Alerting rules for the PassKeyAuth identity service.
+groups:
+  - name: passkeyauth-availability
+    rules:
+      - alert: PassKeyAuthNodeDown
+        expr: up{job="passkeyauth-node"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PassKeyAuth identity-service node is down"
+          description: "Prometheus cannot scrape {{ $labels.instance }} for over 1 minute."
+
+      - alert: OtelCollectorDown
+        expr: up{job="otel-collector"} == 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "OpenTelemetry Collector is down"
+          description: "Traces are not being collected."
+
+  - name: passkeyauth-identity
+    rules:
+      - alert: PassKeyAuthScanStalled
+        expr: rate(passkeyauth_scan_total[5m]) == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "PassKeyAuth statistics scanning has stalled"
+          description: "No scan cycle completed in 5m — identity metrics are going stale."
+
+      - alert: PassKeyAuthPollStalled
+        expr: rate(passkeyauth_poll_total[5m]) == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "PassKeyAuth data-source polling has stalled"
+          description: "No poll cycle completed in 5m — on-chain state mirror is going stale."
+
+      - alert: PassKeyAuthPollErrors
+        expr: rate(passkeyauth_poll_errors_total[5m]) > 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "PassKeyAuth poll cycles are failing"
+          description: "Data-source poll errors have been continuous for 10m."

@@ -1,0 +1,47 @@
+[package]
+name = "passkeyauth-node"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "passkeyauth-node"
+path = "src/main.rs"
+
+[lib]
+name = "passkeyauth_node"
+path = "src/lib.rs"
+
+[dependencies]
+passkeyauth-types = { workspace = true }
+passkeyauth-resilience = { workspace = true }
+passkeyauth-core = { workspace = true }
+passkeyauth-infra = { workspace = true }
+passkeyauth-api = { workspace = true }
+tokio = { workspace = true }
+axum = { workspace = true }
+async-graphql = { workspace = true }
+async-graphql-axum = { workspace = true }
+tower = { workspace = true }
+tower-http = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+serde_json = { workspace = true }
+metrics = { workspace = true }
+metrics-exporter-prometheus = { workspace = true }
+clap = { workspace = true }
+dotenvy = { workspace = true }
+anyhow = { workspace = true }
+futures = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+
+[[bench]]
+name = "merkle"
+harness = false
+
+[dev-dependencies.criterion]
+workspace = true
